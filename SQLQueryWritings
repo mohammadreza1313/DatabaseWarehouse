@@ -1,0 +1,86 @@
+SELECT * FROM Customer;
+
+SELECT c.CustomerID, c.Name, s.PlanID, sp.PlanName
+FROM Customer c
+JOIN Subscription s ON c.CustomerID = s.CustomerID
+JOIN ServicePlan sp ON s.PlanID = sp.PlanID
+WHERE s.IsActive = TRUE;
+
+SELECT Name, Email, DateOfBirth
+FROM Customer
+WHERE DateOfBirth < '1990-01-01';
+
+SELECT * FROM ServicePlan;
+
+SELECT *
+FROM ServicePlan
+ORDER BY MonthlyCost DESC
+LIMIT 1;
+
+SELECT sp.PlanName, COUNT(s.SubscriptionID) AS TotalSubscribers
+FROM ServicePlan sp
+LEFT JOIN Subscription s ON sp.PlanID = s.PlanID
+GROUP BY sp.PlanName;
+
+SELECT c.Name, SUM(cl.Duration) AS TotalCallSeconds
+FROM CallLog cl
+JOIN Customer c ON cl.CustomerID = c.CustomerID
+WHERE MONTH(cl.CallDate) = MONTH(CURRENT_DATE()) AND YEAR(cl.CallDate) = YEAR(CURRENT_DATE())
+GROUP BY c.Name;
+
+SELECT c.Name, SUM(du.DataUsedMB) AS TotalDataMB
+FROM DataUsage du
+JOIN Customer c ON du.CustomerID = c.CustomerID
+WHERE MONTH(du.SessionStart) = MONTH(CURRENT_DATE()) AND YEAR(du.SessionStart) = YEAR(CURRENT_DATE())
+GROUP BY c.Name
+ORDER BY TotalDataMB DESC
+LIMIT 3;
+
+SELECT b.BillID, c.Name, b.Amount, b.BillDate
+FROM Bill b
+JOIN Customer c ON b.CustomerID = c.CustomerID
+WHERE b.Status = 'Unpaid';
+
+
+SELECT c.Name, SUM(b.Amount) AS TotalBilled
+FROM Customer c
+JOIN Bill b ON c.CustomerID = b.CustomerID
+GROUP BY c.Name;
+
+
+SELECT DISTINCT c.Name
+FROM Payment p
+JOIN Bill b ON p.BillID = b.BillID
+JOIN Customer c ON b.CustomerID = c.CustomerID
+WHERE MONTH(p.PaymentDate) = MONTH(CURRENT_DATE() - INTERVAL 12 MONTH)
+  AND YEAR(p.PaymentDate) = YEAR(CURRENT_DATE() - INTERVAL 12 MONTH)
+  AND p.AmountPaid > 30;
+
+
+SELECT c.Name, sp.PlanName, sp.MonthlyCost
+FROM Customer c
+JOIN Subscription s ON c.CustomerID = s.CustomerID
+JOIN ServicePlan sp ON s.PlanID = sp.PlanID
+WHERE s.IsActive = TRUE;
+
+
+SELECT c.Name, 
+       IFNULL(SUM(cl.Duration), 0) AS TotalCallSeconds, 
+       IFNULL(SUM(du.DataUsedMB), 0) AS TotalDataUsed,
+       (IFNULL(SUM(cl.Duration), 0)/60 + IFNULL(SUM(du.DataUsedMB), 0)/1024) AS UsageScore
+FROM Customer c
+LEFT JOIN CallLog cl ON c.CustomerID = cl.CustomerID
+LEFT JOIN DataUsage du ON c.CustomerID = du.CustomerID
+GROUP BY c.Name
+ORDER BY UsageScore DESC
+LIMIT 2;
+
+
+
+SELECT c.Name, COUNT(cs.TicketID) AS SupportTickets
+FROM CustomerSupport cs
+JOIN Customer c ON cs.CustomerID = c.CustomerID
+WHERE cs.DateOpened >= CURDATE() - INTERVAL 1 MONTH
+GROUP BY c.Name
+HAVING COUNT(cs.TicketID) > 1;
+
