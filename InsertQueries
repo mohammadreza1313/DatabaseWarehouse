@@ -1,0 +1,55 @@
+-- Insert Customers
+INSERT INTO Customer (Name, Email, Phone, Address, DateOfBirth) VALUES
+('Alice Johnson', 'alice.j@example.com', '0712345678', '123 Main Street, London', '1985-06-15'),
+('Bob Smith', 'bob.smith@example.com', '0723456789', '456 High Street, Manchester', '1990-12-22'),
+('Charlie Patel', 'charlie.p@example.com', '0734567890', '789 Low Street, Birmingham', '1982-03-10');
+
+-- Insert Service Plans
+INSERT INTO ServicePlan (PlanName, PlanType, MonthlyCost, DataLimit, CallMinutes, SMSLimit) VALUES
+('Basic Voice Plan', 'Voice', 10.99, NULL, 200, 50),
+('Data Max', 'Data', 19.99, 10000, NULL, NULL),
+('Unlimited Bundle', 'Bundle', 39.99, 20000, 1000, 1000);
+
+-- Insert Subscriptions
+INSERT INTO Subscription (CustomerID, PlanID, StartDate, EndDate, IsActive) VALUES
+(1, 3, '2024-01-01', NULL, TRUE),
+(2, 1, '2024-03-01', NULL, TRUE),
+(3, 2, '2024-04-01', NULL, TRUE);
+
+-- Insert Call Logs
+INSERT INTO CallLog (CustomerID, CallDate, Duration, CallType, DestinationNumber) VALUES
+(1, '2024-06-01 08:30:00', 180, 'Local', '0789012345'),
+(2, '2024-06-02 14:00:00', 600, 'International', '+14165551234'),
+(1, '2024-06-03 09:15:00', 240, 'Local', '0712345678');
+
+-- Insert SMS Logs
+INSERT INTO SMSLog (CustomerID, SMSDate, DestinationNumber) VALUES
+(1, '2024-06-01 08:35:00', '0789012345'),
+(2, '2024-06-02 14:05:00', '+14165551234');
+
+-- Insert Data Usage
+INSERT INTO DataUsage (CustomerID, SessionStart, SessionEnd, DataUsedMB) VALUES
+(1, '2024-06-01 09:00:00', '2024-06-01 10:00:00', 500.75),
+(3, '2024-06-03 20:00:00', '2024-06-03 21:30:00', 1024.00);
+
+-- Insert Bills
+INSERT INTO Bill (CustomerID, BillDate, Amount, Status) VALUES
+(1, '2024-06-01', 39.99, 'Paid'),
+(2, '2024-06-01', 10.99, 'Unpaid'),
+(3, '2024-06-01', 19.99, 'Paid');
+
+-- Insert Payments
+INSERT INTO Payment (BillID, PaymentDate, PaymentMethod, AmountPaid) VALUES
+(1, '2024-06-02', 'Credit Card', 39.99),
+(3, '2024-06-02', 'Bank Transfer', 19.99);
+
+-- Insert Network Elements
+INSERT INTO NetworkElement (ElementType, Location, Status) VALUES
+('Tower', 'London East', 'Active'),
+('Router', 'Manchester Central', 'Maintenance'),
+('Switch', 'Birmingham North', 'Active');
+
+-- Insert Customer Support Tickets
+INSERT INTO CustomerSupport (CustomerID, IssueDescription, DateOpened, DateResolved, Status) VALUES
+(1, 'Slow internet during peak hours', '2024-06-01 10:00:00', '2024-06-02 14:30:00', 'Resolved'),
+(2, 'Incorrect billing amount', '2024-06-03 09:00:00', NULL, 'Open');
