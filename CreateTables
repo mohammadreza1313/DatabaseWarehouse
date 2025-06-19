@@ -1,0 +1,113 @@
+-- Drop existing tables if they exist (in reverse dependency order)
+DROP TABLE IF EXISTS CustomerSupport;
+DROP TABLE IF EXISTS Payment;
+DROP TABLE IF EXISTS Bill;
+DROP TABLE IF EXISTS DataUsage;
+DROP TABLE IF EXISTS SMSLog;
+DROP TABLE IF EXISTS CallLog;
+DROP TABLE IF EXISTS Subscription;
+DROP TABLE IF EXISTS ServicePlan;
+DROP TABLE IF EXISTS NetworkElement;
+DROP TABLE IF EXISTS Customer;
+
+-- Customer Table
+CREATE TABLE Customer (
+    CustomerID INT AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL,
+    Email VARCHAR(100),
+    Phone VARCHAR(20),
+    Address TEXT,
+    DateOfBirth DATE
+);
+
+-- Service Plan Table
+CREATE TABLE ServicePlan (
+    PlanID INT AUTO_INCREMENT PRIMARY KEY,
+    PlanName VARCHAR(100) NOT NULL,
+    PlanType ENUM('Voice', 'SMS', 'Data', 'Bundle') NOT NULL,
+    MonthlyCost DECIMAL(10, 2) NOT NULL,
+    DataLimit INT, -- in MB
+    CallMinutes INT,
+    SMSLimit INT
+);
+
+-- Subscription Table
+CREATE TABLE Subscription (
+    SubscriptionID INT AUTO_INCREMENT PRIMARY KEY,
+    CustomerID INT NOT NULL,
+    PlanID INT NOT NULL,
+    StartDate DATE NOT NULL,
+    EndDate DATE,
+    IsActive BOOLEAN DEFAULT TRUE,
+    FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID),
+    FOREIGN KEY (PlanID) REFERENCES ServicePlan(PlanID)
+);
+
+-- Call Log Table
+CREATE TABLE CallLog (
+    CallID INT AUTO_INCREMENT PRIMARY KEY,
+    CustomerID INT NOT NULL,
+    CallDate DATETIME NOT NULL,
+    Duration INT, -- in seconds
+    CallType ENUM('Local', 'International') NOT NULL,
+    DestinationNumber VARCHAR(20),
+    FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID)
+);
+
+-- SMS Log Table
+CREATE TABLE SMSLog (
+    SMSID INT AUTO_INCREMENT PRIMARY KEY,
+    CustomerID INT NOT NULL,
+    SMSDate DATETIME NOT NULL,
+    DestinationNumber VARCHAR(20),
+    FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID)
+);
+
+-- Data Usage Table
+CREATE TABLE DataUsage (
+    UsageID INT AUTO_INCREMENT PRIMARY KEY,
+    CustomerID INT NOT NULL,
+    SessionStart DATETIME NOT NULL,
+    SessionEnd DATETIME NOT NULL,
+    DataUsedMB DECIMAL(10,2),
+    FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID)
+);
+
+-- Bill Table
+CREATE TABLE Bill (
+    BillID INT AUTO_INCREMENT PRIMARY KEY,
+    CustomerID INT NOT NULL,
+    BillDate DATE NOT NULL,
+    Amount DECIMAL(10, 2) NOT NULL,
+    Status ENUM('Paid', 'Unpaid') DEFAULT 'Unpaid',
+    FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID)
+);
+
+-- Payment Table
+CREATE TABLE Payment (
+    PaymentID INT AUTO_INCREMENT PRIMARY KEY,
+    BillID INT NOT NULL,
+    PaymentDate DATE NOT NULL,
+    PaymentMethod ENUM('Credit Card', 'Bank Transfer', 'Cash', 'Other') NOT NULL,
+    AmountPaid DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (BillID) REFERENCES Bill(BillID)
+);
+
+-- Network Element Table
+CREATE TABLE NetworkElement (
+    ElementID INT AUTO_INCREMENT PRIMARY KEY,
+    ElementType ENUM('Tower', 'Router', 'Switch', 'Other') NOT NULL,
+    Location VARCHAR(100) NOT NULL,
+    Status ENUM('Active', 'Inactive', 'Maintenance') DEFAULT 'Active'
+);
+
+-- Customer Support Table
+CREATE TABLE CustomerSupport (
+    TicketID INT AUTO_INCREMENT PRIMARY KEY,
+    CustomerID INT NOT NULL,
+    IssueDescription TEXT NOT NULL,
+    DateOpened DATETIME NOT NULL,
+    DateResolved DATETIME,
+    Status ENUM('Open', 'In Progress', 'Resolved', 'Closed') DEFAULT 'Open',
+    FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID)
+);
